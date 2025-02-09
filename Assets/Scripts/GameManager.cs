@@ -9,17 +9,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pinCollection;
     [SerializeField] private Transform pinAnchor;
     [SerializeField] private InputManager inputManager;
-    private FallTrigger[] pins;
+    private FallTrigger[] fallTriggers;
     private GameObject pinObjects;
 
     private void Start()
     {
-        pins = FindObjectsByType<FallTrigger>((FindObjectsSortMode)FindObjectsInactive.Include);
-
-        foreach (FallTrigger pin in pins)
-        {
-            pin.OnPinFall.AddListener(IncrementScore);
-        }
         inputManager.OnResetPressed.AddListener(HandleReset);
         SetPins();
     }
@@ -36,18 +30,25 @@ public class GameManager : MonoBehaviour
     }
 
     private void SetPins()
+ {
+
+    if(pinObjects)
     {
-        if (pinObjects)
+        foreach (Transform child in pinObjects.transform)
         {
-            foreach (Transform child in pinObjects.transform)
-            {
-                Destroy(child.gameObject);
-            }
-            Destroy(pinObjects);
+            Destroy(child.gameObject);
         }
-        pinObjects = Instantiate(pinCollection, pinAnchor.transform.position, Quaternion.identity, transform);
-        pins = FindObjectsByType<FallTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (FallTrigger pin in pins)
+
+
+        Destroy(pinObjects);
+    }
+    pinObjects = Instantiate(pinCollection,
+    pinAnchor.transform.position,
+    Quaternion.identity, transform);
+
+    fallTriggers = FindObjectsByType<FallTrigger>(FindObjectsInactive.Include,
+    FindObjectsSortMode.None);
+        foreach (FallTrigger pin in fallTriggers)
         {
             pin.OnPinFall.AddListener(IncrementScore);
         }
